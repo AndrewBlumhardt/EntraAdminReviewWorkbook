@@ -1,0 +1,800 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# Entra Admin User Review Workbook"
+      },
+      "name": "text - 5"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "abc4834c-384e-4c13-9e27-50ba42c77071",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspace",
+            "type": 5,
+            "isRequired": true,
+            "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| summarize Selected = makelist(id, 10), All = makelist(id, 1000)\r\n| mvexpand All limit 1000\r\n| project value = tostring(All), label = tostring(All), selected = iff(Selected contains All, true, false)\r\n| where value !contains \"DefaultW\"",
+            "crossComponentResources": [
+              "value::tenant"
+            ],
+            "typeSettings": {
+              "resourceTypeFilter": {
+                "microsoft.operationalinsights/workspaces": true
+              },
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resources/tenants",
+            "value": ""
+          },
+          {
+            "id": "ae2dfba8-9c08-4170-8f66-4f4530ddfc99",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeGenerated",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": {
+              "durationMs": 7776000000
+            }
+          },
+          {
+            "id": "3e0170f3-36df-4149-ab6a-97bdeb6a2cc4",
+            "version": "KqlParameterItem/1.0",
+            "name": "Search",
+            "label": "Search Term",
+            "type": 1,
+            "description": "Keyword like admin or adm",
+            "isRequired": true,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ".admin@"
+          },
+          {
+            "id": "67bcb5dc-3233-484e-928a-98f547ea294f",
+            "version": "KqlParameterItem/1.0",
+            "name": "showHelp",
+            "label": "Show Help",
+            "type": 2,
+            "isRequired": true,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n  {\r\n    \"value\": \"Yes\",\r\n    \"label\": \"Yes\"\r\n  },\r\n  {\r\n    \"value\": \"Noa\",\r\n    \"label\": \"No\"\r\n  }\r\n]\r\n",
+            "value": "Noa"
+          }
+        ],
+        "style": "above",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Overview\r\n\r\nThis workbook helps identify and review administrative user accounts in Microsoft Entra ID, which often use identifiers like `admin` or `adm`. Since these accounts typically lack an inbox, this workbook helps bridge the gap by identifying potential contact emails from active users with similar names. It pulls data from Entra sign-in logs to facilitate auditing and improve communication with administrators.\r\n\r\nYou may need to revise the workbook's KQL queries if your naming pattern differs significantly.\r\n\r\n---\r\n\r\n## Important Note on Data Scope\r\n\r\nThis workbook's analysis is based on **Microsoft Entra sign-in logs**. Therefore, it will only include administrative accounts that have been active within the selected time range of the query.\r\n\r\n**Accounts that have been idle and have no sign-in activity during that period will not appear in the results.**\r\n\r\n---\r\n\r\n## Workbook Tabs\r\n\r\n### 1. Admin Activity Review\r\n\r\nThis tab provides a dashboard for auditing admin activity. It includes widgets for:\r\n*   Authentication success and failure.\r\n*   Possible contact emails based on name matching.\r\n*   Privileged Identity Management (PIM) activity.\r\n*   Azure activity.\r\n\r\n### 2. Downloadable Admin Contact List\r\n\r\nThis tab provides a downloadable table listing all identified admins alongside potential user accounts. This list can be used to support automated or manual efforts to add contact emails to the admin user account properties in Entra ID.\r\n"
+            },
+            "name": "text - 0"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "showHelp",
+        "comparison": "isEqualTo",
+        "value": "Yes"
+      },
+      "name": "Show Help"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "tabStyle": "bigger",
+        "links": [
+          {
+            "id": "dc877aa9-7343-437d-86fe-2b13ac8d318f",
+            "cellValue": "tab",
+            "linkTarget": "parameter",
+            "linkLabel": "Admin Review",
+            "subTarget": "tab1",
+            "style": "link"
+          },
+          {
+            "id": "ba0c237c-39c8-4ebf-9ce4-16ddb9ca75a9",
+            "cellValue": "tab",
+            "linkTarget": "parameter",
+            "linkLabel": "Admin User Lookup",
+            "subTarget": "tab2",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 2"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let adminSignins = SigninLogs\r\n| summarize arg_max(TimeGenerated, *) by UserPrincipalName\r\n| where UserPrincipalName contains \"{Search}\"\r\n| extend username = tostring(split(UserPrincipalName, \"@\")[0])\r\n| extend nameParts = split(username, \".\")\r\n| extend firstName = tostring(nameParts[0])\r\n| extend lastName = tostring(nameParts[-2])\r\n| extend compare = strcat(firstName, lastName)\r\n| project Admin_UPN=UserPrincipalName, Admin_DisplayName=Identity, compare;\r\nlet nonAdminSignins = SigninLogs\r\n| summarize arg_max(TimeGenerated, *) by UserPrincipalName\r\n| where UserPrincipalName !contains \"admin\"\r\n| extend username = tostring(split(UserPrincipalName, \"@\")[0])\r\n| extend nameParts = split(username, \".\")\r\n| extend firstName = tostring(nameParts[0])\r\n| extend lastName = tostring(nameParts[-2])\r\n| extend compare = strcat(firstName, lastName)\r\n| project User_UPN=UserPrincipalName, User_DisplayName=Identity, compare;\r\nadminSignins\r\n| join kind=inner (\r\nnonAdminSignins\r\n) on compare\r\n| summarize Correlated_User_UPNs = make_list(User_UPN) by Admin_UPN, Admin_DisplayName\r\n| project \r\n    Admin_DisplayName,\r\n    Admin_UPN, \r\n    Count = array_length(Correlated_User_UPNs),\r\n    Sample_User = Correlated_User_UPNs[0],\r\n    Correlated_User_UPNs",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContextFromParameter": "TimeGenerated",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Admin_DisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Admin_UPN",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "45ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Sample_User",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "35ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Correlated_User_UPNs",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "35ch"
+                    }
+                  }
+                ],
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "name": "query - 0"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "tab",
+        "comparison": "isEqualTo",
+        "value": "tab2"
+      },
+      "name": "Group2"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SigninLogs\r\n| where ResultSignature == \"SUCCESS\"\r\n| summarize arg_max(TimeGenerated, *) by UserPrincipalName\r\n| where UserPrincipalName contains \"{Search}\"\r\n| extend State = LocationDetails.state\r\n| extend City = LocationDetails.city\r\n| extend DeviceName = DeviceDetail.displayName\r\n| extend FirstName = split(Identity, \" \").[0]\r\n| extend LastName = split(Identity, \" \").[-2]  //Update to match your naming pattern\r\n| extend UPN_Prefix = split(UserPrincipalName, \".admin\").[0] //Update to match your naming pattern\r\n| project TimeGenerated, DisplayName=Identity, UserPrincipalName, UserId, Country=Location, State, City, DeviceName, IPAddress, FirstName, LastName, UPN_Prefix",
+              "size": 1,
+              "title": "Most Recent Successful Admin Signin Activity",
+              "timeContextFromParameter": "TimeGenerated",
+              "exportedParameters": [
+                {
+                  "fieldName": "UserPrincipalName",
+                  "parameterName": "UserPrincipalName",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "UPN_Prefix",
+                  "parameterName": "UPN_Prefix",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "FirstName",
+                  "parameterName": "FirstName",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "LastName",
+                  "parameterName": "LastName",
+                  "parameterType": 1
+                }
+              ],
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "28ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserPrincipalName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "45ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserId",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "40ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Country",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "State",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "City",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DeviceName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "IPAddress",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "FirstName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "LastName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "UPN_Prefix",
+                    "formatter": 5
+                  }
+                ],
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "name": "Signin Logs Query"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SigninLogs\r\n| where UserPrincipalName == \"{UserPrincipalName}\"\r\n| summarize count() by bin(TimeGenerated, 1d), Status=ResultSignature",
+              "size": 4,
+              "title": "Admin User Signin History",
+              "timeContextFromParameter": "TimeGenerated",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "visualization": "timechart",
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "UPN_Prefix",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "Admin User Signin History Time Chart"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SigninLogs\r\n| where UserPrincipalName == \"{UserPrincipalName}\"\r\n| extend State = LocationDetails.state\r\n| extend City = LocationDetails.city\r\n| extend DeviceName = DeviceDetail.displayName\r\n| extend Browser = DeviceDetail.browser\r\n| extend OS = DeviceDetail.operatingSystem\r\n| extend NetworkType = parse_json(NetworkLocationDetails)[1].networkType\r\n| extend Network = parse_json(tostring(parse_json(NetworkLocationDetails)[1].networkNames))[0]\r\n| extend icon = ResultSignature\r\n| project TimeGenerated, ['🚪Signin']=icon, Status=ResultSignature, RiskState, AppDisplayName, DisplayName=Identity, UserPrincipalName, UserId, UserType, Country=Location, State, City, DeviceName, OS, Browser, IPAddress, Network, NetworkType, MFA=AuthenticationRequirement, CA_Status=ConditionalAccessStatus",
+              "size": 1,
+              "title": "Admin User Signin History",
+              "timeContextFromParameter": "TimeGenerated",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "🚪",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "SUCCESS",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "Status",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "RiskState",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "11ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "AppDisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "28ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "28ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserPrincipalName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "45ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserId",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "36ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserType",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "14ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Country",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "State",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "City",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "13ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DeviceName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "OS",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "15ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Browser",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "16ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "IPAddress",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "16ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Network",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "NetworkType",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "MFA",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "CA_Status",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "14ch"
+                    }
+                  }
+                ],
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "UPN_Prefix",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "Admin User Signin History"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SigninLogs\r\n| where UserPrincipalName startswith \"{UPN_Prefix}\" or (Identity contains \"{FirstName}\" and Identity contains \"{LastName}\")\r\n| extend UPN_Prefix = split(UserPrincipalName, \"@\").[0]\r\n| extend UPN_Prefix = split(UPN_Prefix, \".\").[-1]\r\n| where UPN_Prefix != \"admin\"\r\n| summarize arg_max(TimeGenerated, *) by UserPrincipalName\r\n| extend State = LocationDetails.state\r\n| extend City = LocationDetails.city\r\n| extend DeviceName = DeviceDetail.displayName\r\n| project TimeGenerated, DisplayName=Identity, UserPrincipalName, UserId, Country=Location, State, City, DeviceName, IPAddress",
+              "size": 4,
+              "title": "Potential Contact User Account",
+              "timeContextFromParameter": "TimeGenerated",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserPrincipalName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "36ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserId",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "38ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Country",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "14ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "State",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "14ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "City",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "14ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DeviceName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "IPAddress",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "17ch"
+                    }
+                  }
+                ],
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "UPN_Prefix",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "Potential Contact User Account"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "AuditLogs\r\n| where Category == \"RoleManagement\"\r\n| where OperationName contains \"Add member to role completed (PIM activation)\"\r\n| extend DisplayName2 =TargetResources[0].displayName\r\n| extend Comment = ResultDescription\r\n| extend Role = TargetResources[0].displayName\r\n| extend DisplayName = TargetResources[2].displayName\r\n| extend UserPrincipalName = TargetResources[2].userPrincipalName\r\n| where UserPrincipalName == \"{UserPrincipalName}\"\r\n| project TimeGenerated, DisplayName, UserPrincipalName, Role, Comment",
+              "size": 1,
+              "title": "PIM Request History",
+              "timeContextFromParameter": "TimeGenerated",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "DisplayName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "26ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "UserPrincipalName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "44ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Role",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  }
+                ],
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "UPN_Prefix",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "PIM Request History"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "AzureActivity\r\n| where Caller == \"{UserPrincipalName}\"\r\n| where ActivityStatusValue == \"Success\"\r\n| extend Action = parse_json(Properties).message\r\n| extend Resource = parse_json(Properties).resource\r\n| project TimeGenerated, Caller, OperationNameValue, Action, ResourceGroup, SubscriptionId, CallerIpAddress, Resource, _ResourceId",
+              "size": 1,
+              "title": "Azure Activity",
+              "timeContextFromParameter": "TimeGenerated",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Caller",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "40ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "OperationNameValue",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "38ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Action",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "34ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "ResourceGroup",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "SubscriptionId",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "42ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "CallerIpAddress",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "15ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Resource",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  }
+                ],
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "UPN_Prefix",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "Azure Activity"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "tab",
+        "comparison": "isEqualTo",
+        "value": "tab1"
+      },
+      "name": "Group1"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Security Center"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
