@@ -4,28 +4,20 @@ This workbook supports structured analyst review of administrative and risky use
 
 ## Why Admin Account Hunting Matters
 
-Recent high-profile breaches share a common thread: the hardest attacker to stop is one operating inside a legitimate, authorized admin account. Once an adversary has privileged credentials — whether through phishing, credential stuffing, insider threat, or supply chain compromise — they can perform actions that look entirely normal to most detection systems. A real admin running real administrative tools is difficult to distinguish from that same account being abused.
+The hardest attacker to stop is one operating inside a legitimate admin account. Once an adversary has privileged credentials through phishing, credential stuffing, insider access, or supply chain compromise, their actions look authorized because they are technically authorized. Standard detection tools are not built to distinguish a real admin from an abused one.
 
-Stopping or alerting on every admin action is not realistic. The signal is in the deviation — behavior that differs from an account's established pattern or from what is expected given context.
+The signal is in the deviation. This workbook does not look for malware or known-bad indicators. It looks for:
 
-This workbook is built around that idea. It does not look for malware or known-bad indicators. It looks for:
+- **Unusual sign-in patterns** before successful authentication: failed attempts, atypical locations, unfamiliar devices, or sequences that do not match the account's history
+- **PIM activation anomalies**: role activations at unusual times, thin or missing justifications, or frequency that does not match prior behavior
+- **Admin change patterns**: bursts of privileged changes or modifications outside normal operational windows
+- **Behavioral drift**: UEBA signals, risky user flags, and device context suggesting an account is operating differently than it has historically
 
-- **Unusual sign-in patterns** prior to successful authentication — failed attempts, atypical locations, unfamiliar devices, or sign-in sequences that do not match the account's history
-- **PIM activation anomalies** — role activations at unusual times, with thin or missing justifications, from new source IPs, or at a frequency that does not match prior behavior
-- **Admin change patterns** — bursts of privileged changes, modifications to sensitive roles or policies, or activity outside normal operational windows
-- **Behavioral drift** — UEBA signals, risky user flags, and device context that suggest an account is operating differently than it has historically
+Individually these signals may be low confidence. Correlated against a single identity, they support a targeted analyst review.
 
-These signals individually may be low confidence. Together, correlated against a single identity, they form the basis for a targeted analyst review.
+This is one part of a broader approach. A more automated insider admin risk solution based on the same concept is in development.
 
-This workbook is one part of a broader approach. A more automated insider admin risk solution built on the same detection concept is in development and will extend this work with scheduled scoring and alerting.
-
-Many organizations also separate daily-use identities from privileged admin accounts. That is good security practice, but it creates an investigation gap:
-
-- Admin accounts are often detached from obvious owner or contact context
-- Admin accounts frequently have limited profile metadata
-- Analysts need fast pivots from admin identity to behavior, incidents, devices, and PIM usage
-
-This workbook is built to close that gap quickly and consistently.
+Many organizations separate daily-use identities from privileged admin accounts, which creates an investigation gap: admin accounts often lack owner context and profile metadata, and analysts need fast pivots from identity to behavior, incidents, devices, and PIM history. This workbook closes that gap.
 
 ## Critical Dependency: Search Term Pattern
 
