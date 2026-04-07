@@ -1,14 +1,29 @@
 # Entra Admin and Risky User Review Workbook
 
-This workbook is a major revision focused on practical analyst workflows for investigating administrative and risky users in Microsoft Entra ID. It correlates Entra sign-ins, Sentinel incidents and alerts, UEBA, MDE device context, PIM activation history, and Azure administrative activity in one place.
+This workbook supports structured analyst review of administrative and risky users in Microsoft Entra ID. It correlates Entra sign-ins, Sentinel incidents and alerts, UEBA, MDE device context, PIM activation history, and Azure administrative activity in one place.
 
-## Why This Workbook Matters
+## Why Admin Account Hunting Matters
 
-Many organizations separate daily-use identities from privileged admin identities. That is good security practice, but it creates an investigation gap:
+Recent high-profile breaches share a common thread: the hardest attacker to stop is one operating inside a legitimate, authorized admin account. Once an adversary has privileged credentials — whether through phishing, credential stuffing, insider threat, or supply chain compromise — they can perform actions that look entirely normal to most detection systems. A real admin running real administrative tools is difficult to distinguish from that same account being abused.
 
-- Admin accounts are often detached from obvious owner/contact context.
-- Admin accounts frequently have limited profile metadata.
-- Analysts need fast pivots from admin identity to behavior, incidents, devices, and PIM usage.
+Stopping or alerting on every admin action is not realistic. The signal is in the deviation — behavior that differs from an account's established pattern or from what is expected given context.
+
+This workbook is built around that idea. It does not look for malware or known-bad indicators. It looks for:
+
+- **Unusual sign-in patterns** prior to successful authentication — failed attempts, atypical locations, unfamiliar devices, or sign-in sequences that do not match the account's history
+- **PIM activation anomalies** — role activations at unusual times, with thin or missing justifications, from new source IPs, or at a frequency that does not match prior behavior
+- **Admin change patterns** — bursts of privileged changes, modifications to sensitive roles or policies, or activity outside normal operational windows
+- **Behavioral drift** — UEBA signals, risky user flags, and device context that suggest an account is operating differently than it has historically
+
+These signals individually may be low confidence. Together, correlated against a single identity, they form the basis for a targeted analyst review.
+
+This workbook is one part of a broader approach. A more automated insider admin risk solution built on the same detection concept is in development and will extend this work with scheduled scoring and alerting.
+
+Many organizations also separate daily-use identities from privileged admin accounts. That is good security practice, but it creates an investigation gap:
+
+- Admin accounts are often detached from obvious owner or contact context
+- Admin accounts frequently have limited profile metadata
+- Analysts need fast pivots from admin identity to behavior, incidents, devices, and PIM usage
 
 This workbook is built to close that gap quickly and consistently.
 
