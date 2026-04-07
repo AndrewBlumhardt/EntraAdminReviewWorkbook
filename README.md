@@ -1,155 +1,98 @@
-# Entra Admin User Review Workbook
+# Entra Admin and Risky User Review Workbook
 
-Workbook for identifying, reviewing, and correlating administrative user accounts in Microsoft Entra ID using Microsoft Sentinel sign-in, audit, and Azure activity logs. This workbook is designed to help organizations audit privileged accounts, validate activity, and identify potential contact user accounts for admin identities that do not have mailboxes.
+This workbook is a major revision focused on practical analyst workflows for investigating administrative and risky users in Microsoft Entra ID. It correlates Entra sign-ins, Sentinel incidents and alerts, UEBA, MDE device context, PIM activation history, and Azure administrative activity in one place.
 
-## Why is this useful?
+## Why This Workbook Matters
 
-It is common practice to separate standard user accounts from privileged admin accounts. Users perform daily work with one account and use a separate admin identity only for elevated tasks. This reduces risk and supports stronger auditing and conditional access controls.
+Many organizations separate daily-use identities from privileged admin identities. That is good security practice, but it creates an investigation gap:
 
-Problems arise when the admin account is not clearly linked to its primary user. Because admin accounts often lack mailboxes and may not list a contact owner in their properties, it can be difficult to determine who actually uses them.
+- Admin accounts are often detached from obvious owner/contact context.
+- Admin accounts frequently have limited profile metadata.
+- Analysts need fast pivots from admin identity to behavior, incidents, devices, and PIM usage.
 
-This workbook supports admin activity review through sign-in, PIM, and Azure activity data, while also helping identify likely primary user accounts based on common naming patterns. It provides a practical way to improve visibility when admin accounts are not formally mapped to their owners.
+This workbook is built to close that gap quickly and consistently.
 
-![Workbook Sample](https://github.com/AndrewBlumhardt/EntraAdminReviewWorkbook/blob/main/workbookSample.png)
+## Critical Dependency: Search Term Pattern
 
----
+The **Search Term** parameter is the key dependency for this workbook.
 
-## Download
+- Default value: `.admin@`
+- Purpose: identify likely admin identities in UPN patterns
+- Example alternatives: `adm`, `-admin`, `_admin`, or a dedicated admin domain marker
 
-Import the workbook JSON file into Azure Monitor or Microsoft Sentinel:
+If your environment does not have a clear and consistent admin naming pattern, matching and correlation quality drops significantly.
 
-AzureAdminReviewWorkbook.json :contentReference[oaicite:0]{index=0}
+Use this view to validate and tune the Search Term first:
 
----
+<p align="center"><img src="./images/searchTerm.png" width="75%"/></p>
 
-## Overview
+## Major Revision Coverage
 
-Administrative accounts frequently:
+### 1. Main Admin Review Experience
 
-- Follow naming conventions such as `first.last.admin@domain.com`
-- Do not have an associated mailbox
-- Are used only for privileged operations
-- May not be centrally tracked for contact purposes
+The main view lists likely admin accounts and enables deeper investigation pivots, including sign-in activity, related incidents and alerts, device context, PIM history, and Azure activity.
 
-This workbook:
+<p align="center"><img src="./images/mainView.png" width="75%"/></p>
 
-- Identifies active admin accounts based on sign-in activity  
-- Correlates admin accounts to likely standard user accounts  
-- Surfaces sign-in, PIM, and Azure activity history  
-- Provides a downloadable list for remediation or contact updates  
+### 2. Risky User Review (Details)
 
-Results are based on Microsoft Entra sign-in logs. Admin accounts without activity during the selected time range will not appear.
+The risky-user path applies the same investigation flow to users flagged by identity risk signals. This is useful for quickly determining whether risky accounts also show privileged or suspicious operational behavior.
 
----
+<p align="center"><img src="./images/detailsView.png" width="75%"/></p>
 
-## Workbook Tabs
+### 3. PIM Activity Review
 
-### Admin Review
+The PIM section provides broad role activation visibility and trend analysis, including role/category filters and activation patterns.
 
-Provides interactive dashboards including:
+<p align="center"><img src="./images/pimReview.png" width="75%"/></p>
 
-- Most recent successful admin sign-in  
-- Sign-in history table and time chart  
-- Location, device, OS, browser, and IP details  
-- Potential correlated non-admin user account  
-- PIM activation history  
-- Azure activity history  
+### 4. PIM Activity Details
 
-### Admin User Lookup
+The detail view highlights activation-level evidence, including role, category, source IP, and justification comments for deeper governance and compliance review.
 
-Provides a downloadable table showing:
+<p align="center"><img src="./images/pimDetails.png" width="75%"/></p>
 
-- Admin display name and UPN  
-- Correlated user accounts based on naming match  
-- Count of potential matches  
-- Sample correlated UPN  
+## Data Sources Required
 
-Designed for export to Excel to support bulk review or update processes.
+For full functionality, your workspace should include:
 
----
+- `SigninLogs`
+- `AuditLogs`
+- `IdentityInfo` (if available from MDI/M365 Defender integration)
+- `BehaviorAnalytics`
+- `SecurityIncident`
+- `SecurityAlert`
+- `DeviceLogonEvents`
+- `DeviceInfo`
+- `AzureActivity`
 
-## Requirements
+If one or more sources are missing, sections can appear empty.
 
-- Microsoft Sentinel enabled  
-- Entra sign-in logs ingested into Log Analytics  
-- AuditLogs table available for PIM history  
-- AzureActivity table available for subscription actions  
-- Reader access to the selected Log Analytics workspace  
+## Import
 
----
+1. Open Microsoft Sentinel or Azure Monitor.
+2. Go to **Workbooks**.
+3. Create a new workbook and open **Advanced Editor**.
+4. Switch to **JSON** mode.
+5. Paste contents of `AzureAdminReviewWorkbook.json`.
+6. Save the workbook.
 
-## Deployment Instructions
+## Analyst Notes
 
-### 1. Download the Workbook File
+- Start by tuning **Search Term** until admin candidate detection matches your naming standard.
+- Validate correlated user matches before operational action.
+- Use PIM comment and source IP context to identify weak or unusual activation behavior.
+- Empty widgets usually indicate missing data source coverage, not necessarily workbook errors.
 
-Download the JSON file:
+## Files
 
-AzureAdminReviewWorkbook.json :contentReference[oaicite:1]{index=1}
-
-### 2. Import into Azure
-
-1. Navigate to Microsoft Sentinel or Azure Monitor.  
-2. Select **Workbooks**.  
-3. Choose **+ New**.  
-4. Open **Advanced Editor**.  
-5. Switch to **JSON** view.  
-6. Paste the contents of `AzureAdminReviewWorkbook.json`.  
-7. Save the workbook.  
-
-### 3. Configure Parameters
-
-The workbook includes the following parameters:
-
-- **Workspace** – Select your Log Analytics workspace  
-- **TimeGenerated** – Choose the analysis time range  
-- **Search Term** – Default is `.admin@`, adjust if needed  
-- **Show Help** – Optional overview guidance  
-
-If your admin naming convention differs significantly, update the KQL parsing logic accordingly.
-
----
-
-## Naming Convention Assumptions
-
-The default logic assumes:
-
-- Admin accounts contain `.admin` in the UPN  
-- First and last names are separated by a period  
-- Standard user accounts do not contain the word `admin`  
-
-If your organization uses different patterns such as `adm-firstlast`, `firstlast-adm`, or a separate admin domain, the KQL queries should be adjusted.
-
----
-
-## Security Considerations
-
-- The workbook reflects only activity present in the selected log retention window.  
-- Dormant admin accounts without recent sign-in activity will not appear.  
-- Correlated user accounts are based on naming similarity, not authoritative identity mapping.  
-- Results should be validated before performing bulk updates.
-
----
-
-## Cost Considerations
-
-The workbook does not deploy additional Azure resources. Costs are limited to:
-
-- Log ingestion  
-- Log retention  
-- Query execution within Log Analytics  
-
----
-
-## Use Cases
-
-- Quarterly privileged account review  
-- Admin contact remediation  
-- PIM activity validation  
-- Azure activity auditing  
-- Governance and compliance reporting  
-
----
+- `AzureAdminReviewWorkbook.json`
+- `images/searchTerm.png`
+- `images/mainView.png`
+- `images/detailsView.png`
+- `images/pimReview.png`
+- `images/pimDetails.png`
 
 ## License
 
-Provided as-is for operational and community use. Review and validate queries prior to production deployment.
+Provided as-is. Validate queries and assumptions in your environment before production use.
