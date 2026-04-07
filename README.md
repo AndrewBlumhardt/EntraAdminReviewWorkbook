@@ -18,7 +18,7 @@ The **Search Term** parameter is the key dependency for this workbook.
 
 - Default value: `.admin@`
 - Purpose: identify likely admin identities in UPN patterns
-- Example alternatives: `adm`, `-admin`, `_admin`, or a dedicated admin domain marker
+- Example alternatives: `adm@`, `-admin@`, `_admin@`, or a dedicated admin domain marker
 
 If your environment does not have a clear and consistent admin naming pattern, matching and correlation quality drops significantly.
 
