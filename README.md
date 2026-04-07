@@ -4,7 +4,7 @@ This workbook supports structured analyst review of administrative and risky use
 
 ## Why Admin Account Hunting Matters
 
-The hardest attacker to stop is one operating inside a legitimate admin account. Once an adversary has privileged credentials through phishing, credential stuffing, insider access, or supply chain compromise, their actions look authorized because they are technically authorized. Standard detection tools are not built to distinguish a real admin from an abused one.
+The hardest attacker to stop is a legitimate admin using their own assigned credentials. Whether disgruntled, coerced, compensated, or placed deliberately, an admin acting within their authorized scope generates activity that looks normal because it is technically normal. Standard detection tools are not built to distinguish an admin doing their job from one doing harm.
 
 The signal is in the deviation. This workbook does not look for malware or known-bad indicators. It looks for:
 
